@@ -33,7 +33,11 @@ app.use(
       // In development, allow localhost/any dev server
       if (!config.isProduction) return callback(null, true);
 
-      if (config.allowedOrigins.includes(origin)) {
+      const isExplicitlyAllowed = config.allowedOrigins.includes(origin);
+      const isVercelDomain = /^https:\/\/[a-zA-Z0-9-_.]+\.vercel\.app$/.test(origin);
+      const isRoshaDomain = /^https:\/\/(?:[a-zA-Z0-9-]+\.)*roshalink\.com$/.test(origin);
+
+      if (isExplicitlyAllowed || isVercelDomain || isRoshaDomain) {
         return callback(null, true);
       }
 
@@ -43,6 +47,9 @@ app.use(
       return callback(corsError);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    optionsSuccessStatus: 200,
   })
 );
 
